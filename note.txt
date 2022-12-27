@@ -1,0 +1,3 @@
+1. Calculation of and G with the given function
+2,3. FFT and calculation of corresponding frequencies assuming sampling 
+rate 44.1kz. Then keeping the positive frequencies.
