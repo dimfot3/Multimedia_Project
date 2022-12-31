@@ -62,22 +62,3 @@ def split_arrays_equally(array, eq_len):
     split_idx_arr = [array[i*eq_len:min((i+1)*eq_len, array.shape[0])] for i in range(np.ceil(array.shape[0]/eq_len).astype('int'))]
     return split_idx_arr
 
-
-class MP3Encoder:
-    def __init__(self, protocol_files_path='./protocol_files/'):
-        coefs = np.loadtxt(f'{protocol_files_path}C_coefs.txt')
-        self.n_subband = 32
-        self.frame_size = 1152
-        self.subbants_len = 1024
-        return
-
-    def encode(self, audio):
-        data = audio.data
-        split_idxs = [min(self.subbants_len * i, data.shape[0]) for i in range(1, np.ceil(data.shape[0]/self.subbants_len).astype(int))]
-        frame_arr = np.split(data, split_idxs, axis=0)
-        self.filterbank(frame_arr[40])
-
-    def filterbank(self, data):
-        sample_splitted = np.array_split(data, self.n_subband)
-        for i, data_part in enumerate(sample_splitted):
-            x = np.hstack(np.repeat(data_part[np.newaxis, :], 16, axis=0))
