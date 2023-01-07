@@ -9,6 +9,7 @@ from quantizer_utils import *
 from time import time
 from tqdm import tqdm
 from rle_utils import *
+from huffman_utils import huff, ihuff
 
 music_file = './data/myfile.wav'
 h_pr = np.load('./protocol_files/h.npy', allow_pickle=True).tolist()['h'].reshape(-1, )
@@ -33,5 +34,11 @@ for i, frame in enumerate(Y_tot[rand_frames]):
     # xh = dequantizer(symb_index, b)
     symb_index, SF, B = all_bands_quantizer(frame_coef, Tg)
     rle_out = RLE(symb_index, M*N)
-    symb_index_new = RLE_inv(rle_out, M*N)
+    bts, table = huff(rle_out)
+    print(bts)
+    new_rle_out = ihuff(bts, table)
+    print((rle_out == new_rle_out).all())
+    symb_index_new = RLE_inv(new_rle_out, M*N)
     print((symb_index == symb_index_new).all())
+
+

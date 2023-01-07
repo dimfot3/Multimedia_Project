@@ -24,18 +24,18 @@ def make_mp3_synthesisfb(h: np.ndarray, M: int) -> np.ndarray:
 
 
 def frame_sub_analysis(xbuff: np.ndarray, H: np.ndarray, q: int) -> np.ndarray:
-	"""
-	"""
-	L, M = H.shape
-	ind = np.zeros([q, L])
-	ind[0, :] = np.arange(L)
+    """
+    """
+    L, M = H.shape
+    ind = np.zeros([q, L])
+    ind[0, :] = np.arange(L)
 
-	for i in range(1, q):
-		ind[i, :] += ind[i - 1, :] + M
-	ind = ind.astype(np.int64)
-	X = xbuff[ind]
-	Y = np.einsum('ik,kj->ij', X, H)
-	return Y
+    for i in range(1, q):
+        ind[i, :] += ind[i - 1, :] + M
+    ind = ind.astype(np.int64)
+    X = xbuff[ind]
+    Y = np.einsum('ik,kj->ij', X, H)
+    return Y
 
 
 def frame_sub_synthesis(ybuff: np.ndarray, G: np.ndarray) -> np.ndarray:
