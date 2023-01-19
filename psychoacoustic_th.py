@@ -17,31 +17,17 @@ fs = 44100
 Y_tot = coder0(music_file, h_pr, M, N)
 
 
-frames_to_plot = 2
+frames_to_plot = 10
 rand_frames = np.random.randint(0, Y_tot.shape[0], frames_to_plot)
 for i, frame in enumerate(Y_tot[rand_frames]):
     frame_coef = frameDCT(frame)
-    # power_coef = DCTpower(frame_coef)
-    # Dk_mat = Dksparse(M*N)
-    # ST = STinit(frame_coef, Dk_mat)
-    # powerST = MaskPower(frame_coef, ST)
-    # z_barks = Hz2Barks(np.arange(frame_coef.shape[0])*fs/(2*frame_coef.shape[0]))
-    # ST_red, ST_power = STreduction(ST, frame_coef, Tq)
-    # sp_f = SpreadFunc(ST_red, ST_power, frame_coef.shape[0] - 1)
-    # tm = Masking_Thresholds(ST_red, ST_power, frame_coef.shape[0] - 1)
-    # Tg = Global_Masking_Thresholds(tm, Tq)
     Dk_mat = Dksparse(M*N)
     Tg = psycho(frame_coef, Dk_mat)
-    plt.plot(Tg)
+    plt.plot(np.arange(frame_coef.shape[0])*fs/(2*M*N), Tg)
+    plt.title(f'Total acoustic threshold at frame:{rand_frames[i]}', fontsize=20, fontweight='bold')
+    plt.xlabel('Hz', fontsize=20)
+    plt.ylabel('Power(dB)', fontsize=20)
+    plt.xticks(fontsize=16)
+    plt.yticks(fontsize=16)
     plt.show()
-    # plt.plot(z_barks, power_coef)
-    # if ST.shape[0]>0:
-    #     plt.stem(z_barks[ST], power_coef[ST], linefmt ='red', label='Tone')
-    # plt.xlabel('Barks', fontsize=20)
-    # plt.ylabel('Power(dB)', fontsize=20)
-    # plt.title(f'Power spectrume frame:{rand_frames[i]}', fontsize=20, fontweight='bold')
-    # plt.xticks(fontsize=16)
-    # plt.yticks(fontsize=16)
-    # plt.legend()
-    # plt.show()
     

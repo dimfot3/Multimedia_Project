@@ -42,8 +42,8 @@ plt.show()
 music_file = './data/myfile.wav'
 xhat, Y_tot = codec0(music_file, h_pr, M, N)
 samplerate, data = wavfile.read(music_file)
-
-plt.plot(data.astype('int16')[0:] - xhat.astype('int16')[0:])
+plt.plot(data.astype('int16')[480:] - xhat.astype('int16')[:-480])
+plt.plot()
 plt.title('x - $\hat{x}$', fontsize=20)
 plt.ylim([data.min(), data.max()])
 plt.tick_params(axis='x', which='both', labelsize=16)
@@ -51,9 +51,10 @@ plt.tick_params(axis='y', which='both', labelsize=16)
 plt.xlabel('time', fontsize=20)
 plt.ylabel('value', fontsize=20)
 plt.show()
-wavfile.write('test.wav', samplerate, xhat.astype('int16'))
-
-plt.plot(20*np.log10(np.abs(data.astype('int16')/(xhat.astype('int16') - data.astype('int16') + 1e-12))))
+wavfile.write('subband_output.wav', samplerate, xhat.astype('int16'))
+print('Music exported as subband_output.wav')
+error = xhat.astype('int16')[:-480] - data.astype('int16')[480:]
+plt.plot(20*np.log10(np.abs(np.where(error == 0, np.inf, data.astype('int16')[480:]/error))))
 plt.title('SNR', fontsize=20, fontweight='bold')
 plt.xlabel('samples', fontsize=20)
 plt.ylabel('dB', fontsize=20)
@@ -64,11 +65,15 @@ plt.show()
 
 Y_tot = coder0(music_file, h_pr, M, N)
 xhat = decoder0(Y_tot, h_pr, M, N)
-wavfile.write('test.wav', samplerate, xhat.astype('int16'))
-
-
-# plt.plot(20*np.log10(np.abs(data.astype('int16')/(xhat.astype('int16') - data.astype('int16') + 1e-12))), label='SNR')
-# plt.show()
+wavfile.write('subband_output.wav', samplerate, xhat.astype('int16'))
+print('Music exported as subband_output.wav')
+plt.plot(20*np.log10(np.abs(np.where(error == 0, np.inf, data.astype('int16')[480:]/error))))
+plt.title('SNR', fontsize=20, fontweight='bold')
+plt.xlabel('samples', fontsize=20)
+plt.ylabel('dB', fontsize=20)
+plt.xticks(fontsize=16)
+plt.yticks(fontsize=16)
+plt.show()
 
 
 

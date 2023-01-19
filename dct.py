@@ -14,7 +14,7 @@ fs = 44100
 Y_tot = coder0(music_file, h_pr, M, N)
 
 
-frames_to_plot = 2
+frames_to_plot = 3
 rand_frames = np.random.randint(0, Y_tot.shape[0], frames_to_plot)
 for i, frame in enumerate(Y_tot[np.random.randint(0, Y_tot.shape[0], frames_to_plot)]):
     frame_coef = frameDCT(frame)

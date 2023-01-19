@@ -19,23 +19,25 @@ def codec0(wavin, h, M, N):
     H = subband_utils.make_mp3_analysisfb(h, M)
     samplerate, data = wavfile.read(wavin)
     data_len = data.shape[0]
-    data_buff = np.append(data, np.zeros((M*N, )))
+    data = np.append(data, np.zeros((M*N, )), axis=0)
     Y_tot = np.zeros((0, N, M))
-    x_frame = np.zeros((M * (N-1) + H.shape[0]))
+    x_buff = np.zeros((M * (N-1) + H.shape[0]))
     for i in range(data_len // (M*N)):
-        x_frame = np.flip(data_buff[:x_frame.shape[0]], axis=0)
-        y_frame = subband_utils.frame_sub_analysis(x_frame, H, N)
+        x_buff = data[0: M * (N-1) + H.shape[0]]
+        y_frame = subband_utils.frame_sub_analysis(x_buff, H, N)
         Y_c = subband_utils.donothing(y_frame).reshape(-1, N, M)
         Y_tot = np.append(Y_tot, Y_c, axis=0)
-        data_buff = np.roll(data_buff, - M * N)
+        data = np.roll(data, - M * N)
 
     G = subband_utils.make_mp3_synthesisfb(h, M)
     x_hat = np.zeros((Y_tot.shape[0]*N*M, ))
     y_frame_buff = np.zeros((N + G.shape[0] // M, M))
+    Y_arr = np.vstack([Y for Y in Y_tot])
+    Y_arr = np.append(Y_arr, np.zeros((G.shape[0] // M, M)), axis=0)
     for fr_i in range(0, Y_tot.shape[0]):
-        y_frame_buff[:N] = subband_utils.idonothing(Y_tot[fr_i])
-        x_hat[fr_i*M*N:(fr_i+1)*M*N] = np.flip(subband_utils.frame_sub_synthesis(y_frame_buff, G), axis=0)
-        y_frame_buff = np.roll(y_frame_buff, N, axis=0)
+        y_frame_buff = subband_utils.idonothing(Y_arr[0: N + G.shape[0] // M])
+        x_hat[fr_i*M*N:(fr_i+1)*M*N] = subband_utils.frame_sub_synthesis(y_frame_buff, G)
+        Y_arr = np.roll(Y_arr, -N, axis=0)
     return x_hat.reshape(-1, ), Y_tot
 
 
@@ -54,15 +56,15 @@ def coder0(wavin, h, M, N):
     H = subband_utils.make_mp3_analysisfb(h, M)
     samplerate, data = wavfile.read(wavin)
     data_len = data.shape[0]
-    data_buff = np.append(data, np.zeros((M*N, )))
+    data = np.append(data, np.zeros((M*N, )), axis=0)
     Y_tot = np.zeros((0, N, M))
-    x_frame = np.zeros((M * (N-1) + H.shape[0]))
+    x_buff = np.zeros((M * (N-1) + H.shape[0]))
     for i in range(data_len // (M*N)):
-        x_frame = np.flip(data_buff[:x_frame.shape[0]], axis=0)
-        y_frame = subband_utils.frame_sub_analysis(x_frame, H, N)
+        x_buff = data[0: M * (N-1) + H.shape[0]]
+        y_frame = subband_utils.frame_sub_analysis(x_buff, H, N)
         Y_c = subband_utils.donothing(y_frame).reshape(-1, N, M)
         Y_tot = np.append(Y_tot, Y_c, axis=0)
-        data_buff = np.roll(data_buff, - M * N)
+        data = np.roll(data, - M * N)
     return Y_tot
 
 def decoder0(Y_tot, h, M, N):
@@ -78,9 +80,11 @@ def decoder0(Y_tot, h, M, N):
     G = subband_utils.make_mp3_synthesisfb(h, M)
     x_hat = np.zeros((Y_tot.shape[0]*N*M, ))
     y_frame_buff = np.zeros((N + G.shape[0] // M, M))
-    for fr_i in range(Y_tot.shape[0]):
-        y_frame_buff[:N] = subband_utils.idonothing(Y_tot[fr_i])
-        x_hat[fr_i*M*N:(fr_i+1)*M*N] = np.flip(subband_utils.frame_sub_synthesis(y_frame_buff, G), axis=0)
-        y_frame_buff = np.roll(y_frame_buff, N, axis=0)
+    Y_arr = np.vstack([Y for Y in Y_tot])
+    Y_arr = np.append(Y_arr, np.zeros((G.shape[0] // M, M)), axis=0)
+    for fr_i in range(0, Y_tot.shape[0]):
+        y_frame_buff = subband_utils.idonothing(Y_arr[0: N + G.shape[0] // M])
+        x_hat[fr_i*M*N:(fr_i+1)*M*N] = subband_utils.frame_sub_synthesis(y_frame_buff, G)
+        Y_arr = np.roll(Y_arr, -N, axis=0)
     return x_hat
 
