@@ -85,7 +85,7 @@ def all_bands_quantizer(c, Tg):
     cb = critical_bands(c.shape[0])
     cs, sc = DCT_band_scale(c)
     Bits_per_critband = np.zeros((sc.shape[0], ), dtype='int')
-    symb_index = np.zeros((c.shape[0], ))
+    symb_index = np.zeros((c.shape[0], ), dtype='int')
     for bandi in range(sc.shape[0]):
         bandi_idxs = (cb == bandi)
         cs_band = cs[bandi_idxs]
