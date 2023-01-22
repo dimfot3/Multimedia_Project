@@ -43,9 +43,8 @@ def STinit(c, D):
     ST_arr = np.zeros((D.shape[0], )).astype(bool)
     for k in range(D.shape[0]):
         idx_t1 = np.array(np.clip([k - 1, k + 1], 0, D.shape[0] - 1))           # k + 1 and k - 1 idxs
-        neibs_idxs = np.argwhere(D[k, :], ).reshape(-1, )        
-        idx_t2 = np.array(np.clip(np.append(k - neibs_idxs, k + neibs_idxs, axis=0).reshape(-1, ), 0, D.shape[0]-1))        # neighbor idxs 
-        idx_t1, idx_t2 = idx_t1[idx_t1!=k], idx_t2[idx_t2!=k]       # filter out k from neighbor idxs
+        idx_t1 = idx_t1[idx_t1!=k]
+        idx_t2 = np.argwhere(D[k, :]==1, ).reshape(-1, )    
         term1 = (c_power[k] > c_power[idx_t1]).all()
         term2 = (c_power[k] > c_power[idx_t2] + 7).all()
         ST_arr[k] = (term1 and term2)
@@ -62,7 +61,7 @@ def MaskPower(c, ST):
     """
     c = np.insert(c, [0, c.shape[0]], 0)        # this padding makes valid the (0 - 1) and (c.shape[0] - 1 + 1)
     ST = ST + 1         # this takes into account the zero padding
-    power_tones = 10*np.log10(c[ST]**2 + c[ST - 1]**2 + c[ST + 1]**2)
+    power_tones = 10 * np.log10(c[ST]**2 + c[ST - 1]**2 + c[ST + 1]**2)
     return power_tones
 
 def Hz2Barks(f):
@@ -72,7 +71,7 @@ def Hz2Barks(f):
     :param f: the frequencies in Hz
     :return: the frequencies in Barks
     """
-    return 13*np.arctan(0.00076*f) + 3.5 * np.arctan((f/7500)**2)
+    return 13 * np.arctan(0.00076 * f) + 3.5 * np.arctan((f / 7500)**2)
 
 def STreduction(ST, c, Tq, fs=44100):
     """
@@ -89,7 +88,7 @@ def STreduction(ST, c, Tq, fs=44100):
     pm_st = MaskPower(c, ST)
     ST_f = ST[pm_st >= Tq[ST]]
     pm_f = pm_st[pm_st >= Tq[ST]]
-    barks = Hz2Barks(np.arange(c.shape[0])*fs/(2*c.shape[0]))
+    barks = Hz2Barks(np.arange(c.shape[0]) * fs / (2 * c.shape[0]))
     barks_st = barks[ST_f]
     barks_diff = np.abs(barks_st.reshape(-1, 1) - barks_st.reshape(1, -1))
     ST_out = np.array([], dtype='int')
@@ -97,7 +96,7 @@ def STreduction(ST, c, Tq, fs=44100):
     for i in range(ST_f.shape[0]):
         barks_diff_st = barks_diff[i]
         close_st = barks_diff_st < 0.5
-        if((ST_f[i] >= ST_f[close_st]).all()):
+        if (pm_f[i] >= pm_f[close_st]).all():
             ST_out = np.append(ST_out, ST_f[i])
             pm_out = np.append(pm_out, pm_f[i])
     return ST_out, pm_out
@@ -107,7 +106,7 @@ def SpreadFunc(ST, PM, Kmax, fs=44100):
     SpreadFunc calculate the spreading effect of a masking tone
 
     :param ST: the masking tones
-    :param PM: the dct coefficients
+    :param PM: the dct coefficients's power of masking tones
     :param Kmax: the maximum discrete frequency
     :param fs: the sample rate (default=44100)
     :return: an array (Kmax + 1) x len(ST) which contains for every column j the 
@@ -142,7 +141,7 @@ def Masking_Thresholds(ST, PM, Kmax, fs=44100):
     """
     spf = SpreadFunc(ST, PM, Kmax, fs=fs)
     tm = np.zeros((Kmax + 1, ST.shape[0]))
-    barks = Hz2Barks(np.arange(Kmax + 1)*fs/(2*(Kmax + 1)))
+    barks = Hz2Barks(np.arange(Kmax + 1) * fs / (2 * (Kmax + 1)))
     for i in range(Kmax + 1):
         for j in range(ST.shape[0]):
             tm[i, j] = PM[j] - 0.275 * barks[j] + spf[i, j] - 6.025
@@ -155,7 +154,7 @@ def Global_Masking_Thresholds(Ti, Tq):
     acoustic threshold at silence.
 
     :param Ti: the masking tones
-    :param Tq: the dct coefficients
+    :param Tq: the acoustic threshold at silence
     :return: An array of len(Tq) that contain the total acoustic threshold at dB
     """
     invlog_Tq = np.power(10, 0.1 * Tq)        # acoustic threshold at silence Power
@@ -173,9 +172,9 @@ def psycho(c, D, Tq_path='./protocol_files/Tq.npy'):
     :return: the total acoustic threshold
     """
     Tq = np.load(Tq_path)[0]
-    Tq[np.isnan(Tq)] = Tq[~np.isnan(Tq)].max()
+    Tq[np.isnan(Tq)] = Tq.max()
     ST = STinit(c, D)
     ST_red, ST_power = STreduction(ST, c, Tq)
-    tm = Masking_Thresholds(ST_red, ST_power, c.shape[0] - 1)
-    Tg = Global_Masking_Thresholds(tm, Tq)
+    Tm = Masking_Thresholds(ST_red, ST_power, c.shape[0] - 1)
+    Tg = Global_Masking_Thresholds(Tm, Tq)
     return Tg
