@@ -55,12 +55,12 @@ def MP3codec(wavin, h, M, N):
     n_frames = len(add_info['B_per_frame'])
     Y_tot = []
     for frame_i in range(n_frames):
-        bits_to_read = add_info['B_per_frame'][frame_i]
-        bitstream = bits2a(f.read((bits_to_read + np.sign((bits_to_read % 8)) * (8 - bits_to_read % 8)) // 8))
-        rle_symbs = ihuff(bitstream, add_info['huff_table'][frame_i])
-        quant_symbs = RLE_inv(rle_symbs, M*N)
-        xh = all_bands_dequantizer(quant_symbs, add_info['B_arr'][frame_i], add_info['scale_arr'][frame_i])
-        Y_tot.append(iframeDCT(xh))
+        bits_to_read = add_info['B_per_frame'][frame_i]                                                         
+        bitstream = bits2a(f.read((bits_to_read + np.sign((bits_to_read % 8)) * (8 - bits_to_read % 8)) // 8))     # read bits and transform them to str
+        rle_symbs = ihuff(bitstream, add_info['huff_table'][frame_i])                                              # inverse huffman
+        quant_symbs = RLE_inv(rle_symbs, M*N)                                                                      # inverse RLE
+        xh = all_bands_dequantizer(quant_symbs, add_info['B_arr'][frame_i], add_info['scale_arr'][frame_i])        # dequantize
+        Y_tot.append(iframeDCT(xh))                                                                                # inverse DCT and store frame
 
     G = subband_utils.make_mp3_synthesisfb(h, M)
     x_hat = np.zeros((n_frames*M*N, ))
@@ -68,9 +68,9 @@ def MP3codec(wavin, h, M, N):
     Y_arr = np.vstack(Y_tot)
     Y_arr = np.append(Y_arr, np.zeros((G.shape[0] // M, M)), axis=0)
     for fr_i in range(0, n_frames):
-        y_frame_buff = subband_utils.idonothing(Y_arr[0: N + G.shape[0] // M])
-        x_hat[fr_i*M*N:(fr_i+1)*M*N] = subband_utils.frame_sub_synthesis(y_frame_buff, G)
-        Y_arr = np.roll(Y_arr, -N, axis=0)
+        y_frame_buff = subband_utils.idonothing(Y_arr[0: N + G.shape[0] // M])                      # push frame into buffer
+        x_hat[fr_i*M*N:(fr_i+1)*M*N] = subband_utils.frame_sub_synthesis(y_frame_buff, G)           # synthesis of subbands
+        Y_arr = np.roll(Y_arr, -N, axis=0)                                                          # shift data to the next frame
     return x_hat
 
 def MP3_cod(wavin, h, M, N, output_stream='./outputs/bitstream.bin', output_addinfo='./outputs/add_info.npy'):

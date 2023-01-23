@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 h_pr = np.load('./protocol_files/h.npy', allow_pickle=True).tolist()['h'].reshape(-1, )
 M = 32
 N = 36
-
 music_file = './data/wav_2mb.wav'
 samplerate, data = wavfile.read(music_file)
 
