@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import subband_utils
 from scipy.io import wavfile
@@ -12,16 +13,14 @@ from bitstring import BitArray
 
 def MP3codec(wavin, h, M, N):
     """
-    MP3codec is the core of MP3 implementation. It is a 
-    simple format that only implements the subband filtering.
-    It encodes and decodes the data.
+    MP3codec performs MP3 encoding and decoding on
+    sound data and return the decoded. 
 
     :param wavin: the path the sound file
     :param h: the prototype filter response
     :param M: the number of filters
     :param N: the length of each subband
-    :return: the decoded sound and the encoded frames as KxNxM array where K 
-    the number of frames
+    :return: the decoded sound
     """
     # MP3 encoding
     #wavin = np.append(wavin, np.zeros((M * N - wavin.shape[0] % (M*N), )), axis=0)
@@ -70,10 +69,30 @@ def MP3codec(wavin, h, M, N):
     for fr_i in range(0, n_frames):
         y_frame_buff = subband_utils.idonothing(Y_arr[0: N + G.shape[0] // M])                      # push frame into buffer
         x_hat[fr_i*M*N:(fr_i+1)*M*N] = subband_utils.frame_sub_synthesis(y_frame_buff, G)           # synthesis of subbands
-        Y_arr = np.roll(Y_arr, -N, axis=0)                                                          # shift data to the next frame
+        Y_arr = np.roll(Y_arr, -N, axis=0)                                                         # shift data to the next frame
+    
+    output_bytes = estimated_size('./outputs/bitstream.bin', "./outputs/add_info.npy")
+    print(f'Initial data size (MB){wavin.shape[0] * 2 / (1024*1024)}\n'+
+    f'Compressed data size (MB){output_bytes/(1024*1024)}\n' +
+    f'Compression Ratio: {(wavin.shape[0] * 2) / output_bytes}\n'+
+    f'Saved space (from initial): {(wavin.shape[0] * 2 - output_bytes)*100 / (wavin.shape[0] * 2)}%')
     return x_hat
 
 def MP3_cod(wavin, h, M, N, output_stream='./outputs/bitstream.bin', output_addinfo='./outputs/add_info.npy'):
+    """
+    MP3_cod performs MP3 encoding on
+    sound data and save the encoded music. 
+    It saved seperatly the quantized bits and the 
+    needed information for dequantized. 
+
+    :param wavin: the path the sound file
+    :param h: the prototype filter response
+    :param M: the number of filters
+    :param N: the length of each subband
+    :param output_stream: the output file to save bitstream (default: './outputs/bitstream.bin')
+    :param output_addinfo: the output file to save additional infomrmation (default: './outputs/add_info.npy')
+    :return: None
+    """
     H = subband_utils.make_mp3_analysisfb(h, M)
     data_len = wavin.shape[0]
     data_padd = np.append(wavin, np.zeros((M*N, )), axis=0)
@@ -99,6 +118,17 @@ def MP3_cod(wavin, h, M, N, output_stream='./outputs/bitstream.bin', output_addi
     np.save(output_addinfo, add_info)                                    # save the additional info (scale factors, huffman table, Bits of each critical band)
 
 def MP3_decod(ouput_bistream, output_add_info, h, M, N):
+    """
+    MP3_cod performs MP3 decoding on
+    compressed sound data.
+
+    :param output_stream: the output file to read bitstream (default: './outputs/bitstream.bin')
+    :param output_addinfo: the output file to read additional infomrmation (default: './outputs/add_info.npy')
+    :param h: the prototype filter response
+    :param M: the number of filters
+    :param N: the length of each subband
+    :return: the decoded sound 
+    """
     f = open(ouput_bistream, 'rb')
     add_info = np.load(output_add_info, allow_pickle=True).tolist()
     n_frames = len(add_info['B_per_frame'])
@@ -123,11 +153,42 @@ def MP3_decod(ouput_bistream, output_add_info, h, M, N):
     return x_hat
 
 def save_bitstream(file, bitstream):
+    """
+    save_bitstream saves the quantized bitstream
+
+    :param file: the output file where it will save it
+    :param bitstream: the bitstream to save
+    :return: None
+    """
     bits = BitArray(bin=bitstream)
     bits.tofile(file)
 
 def bits2a(b):
+    """
+    bits2a makes the bitstream for binary to string of 0 and 1
+
+    :param b: bitstream in binary
+    :return: None
+    """
     return "".join(f"{n:08b}" for n in b)
 
 def estimated_size(bitstream_file, add_info_file):
-    return 0
+    """
+    estimated_size estimates the size of compressed song. Each value
+    in additional information takes 16bits. So the total size is the 
+    total bitstream + additional information.
+
+    :param bitstream_file: the bitstream file
+    :param add_info_file: the addional information path
+    :return: None
+    """
+    add_info = np.load(add_info_file, allow_pickle=True).tolist()
+    nframes = len(add_info['scale_arr'])
+    scale_bits = nframes * len(add_info['scale_arr'][0]) * 16
+    bits_arr_bits = nframes * len(add_info['B_arr'][0]) * 16
+    huftable_bits = nframes * (add_info['huff_table'][0].shape[0] + add_info['huff_table'][0].shape[1]) * 16
+    bitspframe_bits = nframes * 16
+    bitstram_bits = os.path.getsize(bitstream_file) * 8
+    total_bytes = (bitstram_bits + scale_bits + bits_arr_bits + huftable_bits + bitspframe_bits) / 8
+    return total_bytes
+
