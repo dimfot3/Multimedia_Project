@@ -21,7 +21,7 @@ def main(args):
         output_bytes = estimated_size(args['out_bitstream_path'], args['add_info_path'])
         output_bytes_simple = estimated_size(args['out_bitstream_path'], None)
         print(f'Initial data size (MB){data.shape[0] * 2 / (1024*1024)}\n'+
-        'WITH ADDITIONAL INFO\nencoded 16bits/value (scale factors, huff table, quantizers\' bits)\n'+
+        'WITH ADDITIONAL INFO encoded 16bits/value (scale factors, huff table, quantizers\' bits)\n'+
         f'Compressed data size (MB){output_bytes/(1024*1024)}\n' +
         f'Compression Ratio: {(data.shape[0] * 2) / output_bytes}\n'+
         f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes)*100 / (data.shape[0] * 2)}%\n'+
@@ -37,7 +37,7 @@ def main(args):
         output_bytes = estimated_size(args['out_bitstream_path'], args['add_info_path'])
         output_bytes_simple = estimated_size(args['out_bitstream_path'], None)
         print(f'Initial data size (MB){data.shape[0] * 2 / (1024*1024)}\n'+
-        'WITH ADDITIONAL INFO\nencoded 16bits/value (scale factors, huff table, quantizers\' bits)\n'+
+        'WITH ADDITIONAL INFO encoded 16bits/value (scale factors, huff table, quantizers\' bits)\n'+
         f'Compressed data size (MB){output_bytes/(1024*1024)}\n' +
         f'Compression Ratio: {(data.shape[0] * 2) / output_bytes}\n'+
         f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes)*100 / (data.shape[0] * 2)}%\n'+
