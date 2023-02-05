@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def RLE(message, K):
     """
     RLE runs run length encoding to efficiently encode 
@@ -11,20 +12,18 @@ def RLE(message, K):
     are found. In the first column there is the symbol that observed 
     and in the second column there is the number of repetitions.
     """
-    encoded_message = np.zeros((0, 2)).astype(int)
-    i = 0
-    while (i <= K - 1):
-        count = 1
-        ch = message[i]
-        j = i
-        while (j < K-1):
-            if (message[j] == message[j+1]):
-                count = count+1
-                j = j+1
-            else:
-                break
-        encoded_message = np.append(encoded_message, np.array([ch, count]).reshape(1, 2), axis=0)
-        i = j+1
+    encoded_message = []
+    count = 0
+    last_sym = message[0]
+    for i in range(1, K):
+        if message[i] == 0:
+            count += 1
+        else:
+            encoded_message.append([last_sym, count])
+            last_sym = message[i]
+            count = 0
+    encoded_message.append([last_sym, count])
+    encoded_message = np.array(encoded_message, dtype='int')
     return encoded_message
 
 def RLE_inv(run_symbols, K):
@@ -37,9 +36,9 @@ def RLE_inv(run_symbols, K):
     :param K: the number of DCT coefficients
     :return: the symbols before RLE
     """
-    symb_index = np.zeros((K, ), dtype='int')
-    last_idx = 0
-    for i in range(run_symbols.shape[0]):
-        symb_index[last_idx:last_idx+run_symbols[i, 1]] = run_symbols[i, 0]
-        last_idx = last_idx + run_symbols[i, 1]
+    symb_index = np.array([], dtype='int')
+    for element in run_symbols:
+        symb_index = np.append(symb_index, element[0])
+        symb_index = np.append(symb_index, np.zeros((element[1], ), dtype=int))
+    symb_index = symb_index[:K]
     return symb_index

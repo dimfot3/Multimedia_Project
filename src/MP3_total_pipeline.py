@@ -36,7 +36,7 @@ def MP3codec(wavin, h, M, N):
         y_frame = subband_utils.frame_sub_analysis(x_buff, H, N)            # frame analysis to subbands
         data_padd = np.roll(data_padd, - M * N)                             # shift buffer for next frame
         frame_coef = frameDCT(y_frame)                                      # DCT to buffer
-        Tg = psycho(frame_coef, Dk_mat) - 15                                # find Tg from psycoacoustic model
+        Tg = psycho(frame_coef, Dk_mat) - 12                                # find Tg from psycoacoustic model
         symb_index, SF, B = all_bands_quantizer(frame_coef, Tg)             # quantize all bands
         rle_out = RLE(symb_index, M*N)                                      # RLE
         bts, table = huff(rle_out)                                          # huffman
@@ -99,7 +99,7 @@ def MP3_cod(wavin, h, M, N, output_stream='./outputs/bitstream.bin', output_addi
         y_frame = subband_utils.frame_sub_analysis(x_buff, H, N)        # frame analysis to subbands
         data_padd = np.roll(data_padd, - M * N)                         # shift buffer for next frame
         frame_coef = frameDCT(y_frame)                                  # DCT to buffer
-        Tg = psycho(frame_coef, Dk_mat) - 15                            # find Tg from psycoacoustic model
+        Tg = psycho(frame_coef, Dk_mat) - 14                            # find Tg from psycoacoustic model
         symb_index, SF, B = all_bands_quantizer(frame_coef, Tg)         # quantize all bands
         rle_out = RLE(symb_index, M*N)                                  # RLE
         bts, table = huff(rle_out)                                      # huffman
