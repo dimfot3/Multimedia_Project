@@ -144,7 +144,7 @@ def Masking_Thresholds(ST, PM, Kmax, fs=44100):
     barks = Hz2Barks(np.arange(Kmax + 1) * fs / (2 * (Kmax + 1)))
     for i in range(Kmax + 1):
         for j in range(ST.shape[0]):
-            tm[i, j] = PM[j] - 0.275 * barks[j] + spf[i, j] - 6.025
+            tm[i, j] = PM[j] - 0.275 * barks[ST[j]] + spf[i, j] - 6.025
     return tm
 
 def Global_Masking_Thresholds(Ti, Tq):

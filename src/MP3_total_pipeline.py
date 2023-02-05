@@ -70,12 +70,6 @@ def MP3codec(wavin, h, M, N):
         y_frame_buff = subband_utils.idonothing(Y_arr[0: N + G.shape[0] // M])                      # push frame into buffer
         x_hat[fr_i*M*N:(fr_i+1)*M*N] = subband_utils.frame_sub_synthesis(y_frame_buff, G)           # synthesis of subbands
         Y_arr = np.roll(Y_arr, -N, axis=0)                                                         # shift data to the next frame
-    
-    output_bytes = estimated_size('./outputs/bitstream.bin', "./outputs/add_info.npy")
-    print(f'Initial data size (MB){wavin.shape[0] * 2 / (1024*1024)}\n'+
-    f'Compressed data size (MB){output_bytes/(1024*1024)}\n' +
-    f'Compression Ratio: {(wavin.shape[0] * 2) / output_bytes}\n'+
-    f'Saved space (from initial): {(wavin.shape[0] * 2 - output_bytes)*100 / (wavin.shape[0] * 2)}%')
     return x_hat
 
 def MP3_cod(wavin, h, M, N, output_stream='./outputs/bitstream.bin', output_addinfo='./outputs/add_info.npy'):
@@ -172,7 +166,7 @@ def bits2a(b):
     """
     return "".join(f"{n:08b}" for n in b)
 
-def estimated_size(bitstream_file, add_info_file):
+def estimated_size(bitstream_file, add_info_file=None):
     """
     estimated_size estimates the size of compressed song. Each value
     in additional information takes 16bits. So the total size is the 
@@ -182,13 +176,16 @@ def estimated_size(bitstream_file, add_info_file):
     :param add_info_file: the addional information path
     :return: None
     """
-    add_info = np.load(add_info_file, allow_pickle=True).tolist()
-    nframes = len(add_info['scale_arr'])
-    scale_bits = nframes * len(add_info['scale_arr'][0]) * 16
-    bits_arr_bits = nframes * len(add_info['B_arr'][0]) * 16
-    huftable_bits = nframes * (add_info['huff_table'][0].shape[0] + add_info['huff_table'][0].shape[1]) * 16
-    bitspframe_bits = nframes * 16
     bitstram_bits = os.path.getsize(bitstream_file) * 8
-    total_bytes = (bitstram_bits + scale_bits + bits_arr_bits + huftable_bits + bitspframe_bits) / 8
+    if add_info_file!=None:
+        add_info = np.load(add_info_file, allow_pickle=True).tolist()
+        nframes = len(add_info['scale_arr'])
+        scale_bits = nframes * len(add_info['scale_arr'][0]) * 16
+        bits_arr_bits = nframes * len(add_info['B_arr'][0]) * 16
+        huftable_bits = nframes * (add_info['huff_table'][0].shape[0] + add_info['huff_table'][0].shape[1]) * 16
+        bitspframe_bits = nframes * 16
+        total_bytes = (bitstram_bits + scale_bits + bits_arr_bits + huftable_bits + bitspframe_bits) / 8
+    else:
+        total_bytes = bitstram_bits / 8
     return total_bytes
 

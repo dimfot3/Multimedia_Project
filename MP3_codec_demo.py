@@ -19,20 +19,32 @@ def main(args):
         wavfile.write(args['output_decoded_data'], samplerate, xhat.astype('int16'))
         # Evaluate compression
         output_bytes = estimated_size(args['out_bitstream_path'], args['add_info_path'])
+        output_bytes_simple = estimated_size(args['out_bitstream_path'], None)
         print(f'Initial data size (MB){data.shape[0] * 2 / (1024*1024)}\n'+
+        'WITH ADDITIONAL INFO\nencoded 16bits/value (scale factors, huff table, quantizers\' bits)\n'+
         f'Compressed data size (MB){output_bytes/(1024*1024)}\n' +
         f'Compression Ratio: {(data.shape[0] * 2) / output_bytes}\n'+
-        f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes)*100 / (data.shape[0] * 2)}%')
+        f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes)*100 / (data.shape[0] * 2)}%\n'+
+        'WITHOUT ADDITIONAL INFO\n'+
+        f'Compressed data size (MB){output_bytes_simple/(1024*1024)}\n' +
+        f'Compression Ratio: {(data.shape[0] * 2) / output_bytes_simple}\n'+
+        f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes_simple)*100 / (data.shape[0] * 2)}%')
     elif args['mode'] == 'encoder':
         sound_file = args['sound_data']
         samplerate, data = wavfile.read(sound_file)
         MP3_cod(data, h_pr, M, N)
         # Evaluate compression
         output_bytes = estimated_size(args['out_bitstream_path'], args['add_info_path'])
+        output_bytes_simple = estimated_size(args['out_bitstream_path'], None)
         print(f'Initial data size (MB){data.shape[0] * 2 / (1024*1024)}\n'+
+        'WITH ADDITIONAL INFO\nencoded 16bits/value (scale factors, huff table, quantizers\' bits)\n'+
         f'Compressed data size (MB){output_bytes/(1024*1024)}\n' +
         f'Compression Ratio: {(data.shape[0] * 2) / output_bytes}\n'+
-        f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes)*100 / (data.shape[0] * 2)}%')
+        f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes)*100 / (data.shape[0] * 2)}%\n'+
+        'WITHOUT ADDITIONAL INFO\n'+
+        f'Compressed data size (MB){output_bytes_simple/(1024*1024)}\n' +
+        f'Compression Ratio: {(data.shape[0] * 2) / output_bytes_simple}\n'+
+        f'Saved space (from initial): {(data.shape[0] * 2 - output_bytes_simple)*100 / (data.shape[0] * 2)}%')
     elif args['mode'] == 'decoder':
         sound_file = args['sound_data']
         samplerate, data = wavfile.read(sound_file)
