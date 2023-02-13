@@ -16,6 +16,9 @@ def main(args):
         sound_file = args['sound_data']
         samplerate, data = wavfile.read(sound_file)
         xhat = MP3codec(data, h_pr, M, N)
+        error = xhat.astype('int16')[:-480] - data.astype('int16')[480:]
+        SNR_arr = 20*np.log10(np.abs(np.where(error == 0, np.inf, np.abs(data.astype("int16"))[480:]/np.abs(error))))
+        print(f'Average SNR: {np.mean(SNR_arr, where=~np.isinf(SNR_arr))}')
         wavfile.write(args['output_decoded_data'], samplerate, xhat.astype('int16'))
         # Evaluate compression
         output_bytes = estimated_size(args['out_bitstream_path'], args['add_info_path'])
@@ -49,6 +52,10 @@ def main(args):
         sound_file = args['sound_data']
         samplerate, data = wavfile.read(sound_file)
         xhat = MP3_decod(args['out_bitstream_path'], args['add_info_path'], h_pr, M, N)
+        error = xhat.astype('int16')[:-480] - data.astype('int16')[480:]
+        SNR_arr = 20*np.log10(np.abs(np.where(error == 0, np.inf, np.abs(data.astype("int16"))[480:]/np.abs(error))))
+        print(f'Average SNR: {np.mean(SNR_arr, where=~np.isinf(SNR_arr))}')
+        plt.plot(SNR_arr)
         wavfile.write(args['output_decoded_data'], samplerate, xhat.astype('int16'))
 
 if __name__== '__main__':
