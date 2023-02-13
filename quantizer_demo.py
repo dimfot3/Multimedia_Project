@@ -33,4 +33,4 @@ for i, frame in tqdm(enumerate(Y_tot), total=Y_tot.shape[0]):
     Y_new[i] = iframeDCT(xh)
 
 xhat = decoder0(Y_new, h_pr, M, N)
-wavfile.write('final.wav', fs, xhat.astype('int16'))
+wavfile.write('outputs/final.wav', fs, xhat.astype('int16'))

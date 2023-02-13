@@ -23,4 +23,11 @@ utilities are implemented.
 ## How to run
 In root folder there are some scripts that can verify correctness of basic parts of the project like the subbands, dct, psychoacoustic model, quantizer, RLE and huffman.
 
-Except from these that are mostly demostration of correctness, there is the MP3_codec_demo.py that run the whole MP3 pipeline.
+Except from these that are mostly demostration of correctness, there is the MP3_codec_demo.py that run the whole MP3 pipeline. Some example of 
+running this script are
+
+- sound codec (encoder/decoder) `python3 MP3_codec_demo.py --mode codec --sound_data ./data/myfile.wav --out_bitstream_path ./outputs/bitstream.bin --add_info_path ./outputs/add_info.npy --output_decoded_data ./outputs/final.wav`
+- sound encoder `python3 MP3_codec_demo.py --mode encoder --sound_data ./data/myfile.wav --out_bitstream_path ./outputs/bitstream.bin --add_info_path ./outputs/add_info.npy`
+- sound decoder `python3 MP3_codec_demo.py --mode decoder --sound_data ./data/myfile.wav --out_bitstream_path ./outputs/bitstream.bin --add_info_path ./outputs/add_info.npy --output_decoded_data ./outputs/final.wav`
+
+
