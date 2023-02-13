@@ -1,0 +1,5 @@
+bitstring>=4.0.1
+matplotlib>=3.6.2
+numpy>=1.23.5
+scipy>=1.8.1
+tqdm>=4.64.1

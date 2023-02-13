@@ -30,10 +30,9 @@ for i, frame in enumerate(Y_tot[rand_frames]):
     symb_index, SF, B = all_bands_quantizer(frame_coef, Tg)
     rle_out = RLE(symb_index, M*N)
     bts, table = huff(rle_out)
-    print(bts)
     new_rle_out = ihuff(bts, table)
-    print((rle_out == new_rle_out).all())
+    print('frame', rand_frames[i],'Huffman inversed:', (rle_out == new_rle_out).all())
     symb_index_new = RLE_inv(new_rle_out, M*N)
-    print((symb_index == symb_index_new).all())
+    print('frame', rand_frames[i], 'RLE inversed:', (symb_index == symb_index_new).all())
 
 

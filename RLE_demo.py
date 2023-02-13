@@ -30,4 +30,4 @@ for i, frame in enumerate(Y_tot[rand_frames]):
     rle_out = RLE(symb_index, M*N)
     symb_index_new = RLE_inv(rle_out, M*N)
     print(symb_index, symb_index_new)
-    print(f'RLE corrected inversed at frame {rand_frames[i]}: ', (symb_index == symb_index_new).all())
+    print(f'RLE correctly inversed at frame {rand_frames[i]}: ', (symb_index == symb_index_new).all())
