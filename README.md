@@ -3,7 +3,7 @@ This is a project for multimedia, subject of 9th semester of Electrical and Comp
 
 The basic components of MP3 are a frequency analysis of the input signal and independent samples. This is followed by a controlled distortion of the signal, which is influenced by a psychoacoustic analysis that reduces the quantization accuracy in areas of the spectrum where the quantization error is not noticeable. Then we have Run Length Encoding and entropy encoding through Huffman.
 
-This project makes a simplified implementation of MP3 codec.
+ This project is a simplified implementation of MP3 codec.
 
 ## Project Structure
 In the root folder there there are:
@@ -24,6 +24,8 @@ In the src the functionalities are splitted to:
 utilities are implemented. 
 
 ## How to run
+First of all it is recomended to run `pip install -r requirements.txt' to install the correct python packages that are used in this project.
+
 In root folder there are some scripts that can verify correctness of basic parts of the project like the subbands, dct, psychoacoustic model, quantizer, RLE and huffman.
 
 Except from these that are mostly demostration of correctness, there is the MP3_codec_demo.py that run the whole MP3 pipeline. Some example of 
