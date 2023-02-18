@@ -24,7 +24,7 @@ In the src the functionalities are splitted to:
 utilities are implemented. 
 
 ## How to run
-First of all it is recomended to run `pip install -r requirements.txt' to install the correct python packages that are used in this project.
+First of all it is recomended to run `pip install -r requirements.txt` to install the correct python packages that are used in this project.
 
 In root folder there are some scripts that can verify correctness of basic parts of the project like the subbands, dct, psychoacoustic model, quantizer, RLE and huffman.
 
