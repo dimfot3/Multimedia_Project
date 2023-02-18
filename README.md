@@ -1,6 +1,9 @@
 # Multimedia_Project
-This is a project for multimedia, subject of 9th semester of Electrical and Computer Engineering in Aristotle University of Thessaloniki.
+This is a project for multimedia, subject of 9th semester of Electrical and Computer Engineering in Aristotle University of Thessaloniki. The MP3 protocol is a form of audio compression used for storing and transmitting audio files over the internet and on audio playback devices. MP3 consists of a compression algorithm that reduces the resolution of the audio without significantly affecting its quality. It is one of the most widely used audio compression protocols and is based on the ISO/IEC 11172-3 protocol.
 
+The basic components of MP3 are a frequency analysis of the input signal and independent samples. This is followed by a controlled distortion of the signal, which is influenced by a psychoacoustic analysis that reduces the quantization accuracy in areas of the spectrum where the quantization error is not noticeable. Then we have Run Length Encoding and entropy encoding through Huffman.
+
+This project makes a simplified implementation of MP3 codec.
 
 ## Project Structure
 In the root folder there there are:
